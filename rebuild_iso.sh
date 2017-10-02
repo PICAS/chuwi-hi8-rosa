@@ -103,7 +103,7 @@ genisoimage -JURT -quiet \
     -boot-load-size 4 \
     -boot-info-table \
     -eltorito-alt-boot \
-    -e EFI/BOOT/grubx64.efi \
+    -e isolinux/efiboot.img \
     -no-emul-boot \
     -input-charset utf-8 \
     -V $ISO_VOL \
@@ -119,7 +119,7 @@ xorriso -as mkisofs \
     -boot-load-size 4 \
     -boot-info-table \
     -eltorito-alt-boot \
-    -e EFI/BOOT/grubx64.efi \
+    -e isolinux/efiboot.img \
     -no-emul-boot \
     -isohybrid-gpt-basdat \
     -V $ISO_VOL \
