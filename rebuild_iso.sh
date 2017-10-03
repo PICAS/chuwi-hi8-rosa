@@ -33,25 +33,36 @@ echo "Обрабатывается $ISO_SRC [Volume id: $ISO_VOL]"
 ISO_DST=`echo $ISO_SRC | sed s/$NAME_ORIG/$NAME_DEST/`
 
 ISO_DIR='iso'
-SQUASHFS_ROOT='squashfs-root'
 SYSTEM_ROOT='system-root'
 
-echo 'Распаковываем образ'
+echo 'Монтируем слои'
+mkdir mnt mnt/iso mnt/squash
+mount $ISO_SRC mnt/iso || die "ошибка монтирования $ISO_SRC"
+mount mnt/iso/$SQUASH_IMG mnt/squash || die "ошибка монтирования $SQUASH_IMG"
+if [[ -f mnt/squash/$SYSTEM_IMG ]]; then
+    echo 'SquashFS содержит образ с файловой системой'
+    mkdir mnt/fs
+    mount -o ro mnt/squash/$SYSTEM_IMG mnt/fs || die "ошибка монтирования $SYSTEM_IMG"
+else
+    ln -rs mnt/squash mnt/fs
+fi
+
+echo 'Копируем образ'
 rm -rf $ISO_DIR
 mkdir $ISO_DIR
-7z x $ISO_SRC -o$ISO_DIR -bso0 || die 'ошибка распаковки ISO'
-rm -rf $ISO_DIR'/[BOOT]'
+rsync --exclude=$SQUASH_IMG -a mnt/iso/ $ISO_DIR
 
-unsquashfs -d $SQUASHFS_ROOT $ISO_DIR/$SQUASH_IMG || die 'ошибка рапаковки SquashFS'
+echo 'Копируем файловую систему'
+rsync -a mnt/fs/ $SYSTEM_ROOT
 
-echo "Монтируем $SYSTEM_IMG"
-mkdir $SYSTEM_ROOT
-sudo mount -o noatime $SQUASHFS_ROOT/$SYSTEM_IMG $SYSTEM_ROOT || die 'ошибка монтирования'
+[[ -f mnt/squash/$SYSTEM_IMG ]] && umount mnt/fs
+umount mnt/squash mnt/iso
+rm -rf mnt
 
 echo 'Обновляем'
 echo -en '\x1b[1m'
 ##############################################################################
-sudo tee $SYSTEM_ROOT/runme << EOF
+tee $SYSTEM_ROOT/runme << EOF
 # Следующие команды выполнятся в контексте распакованного образа
 cat /etc/os-release
 
@@ -60,9 +71,9 @@ EOF
 ##############################################################################
 echo -en '\x1b[0m'
 
-sudo chmod +x $SYSTEM_ROOT/runme
+chmod +x $SYSTEM_ROOT/runme
 echo -en '\x1b[1;33m'
-sudo systemd-nspawn --directory=$SYSTEM_ROOT /runme
+systemd-nspawn --directory=$SYSTEM_ROOT /runme
 echo -en '\x1b[0m'
 
 # Формируем актуальный перечень установленных пакетов, добавив дату изменения
@@ -72,26 +83,12 @@ date -R >> $ISO_DIR/rpm.lst
 cat $SYSTEM_ROOT/rpm.list >> $ISO_DIR/rpm.lst
 
 echo 'Убираем за собой'
-sudo rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list
+rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list
 
-# Для лучшего сжатия зануляем свободные блоки файловой системы
-sudo cp /dev/zero $SYSTEM_ROOT/free_space 2> /dev/null
-sudo rm $SYSTEM_ROOT/free_space
-
-sudo umount $SYSTEM_ROOT
-rmdir $SYSTEM_ROOT
-
-sudo tune2fs -C 0 -M '' $SQUASHFS_ROOT/$SYSTEM_IMG
-
+echo 'Создаём SquashFS'
 rm -f $ISO_DIR/$SQUASH_IMG
-if [ "x$COMPRESSOR" == "x" ] ; then
-    echo 'Запуск ОС без SquashFS не поддерживается!?'
-    mv $SQUASHFS_ROOT/$SYSTEM_IMG $ISO_DIR/$SQUASH_IMG
-else
-    mksquashfs $SQUASHFS_ROOT $ISO_DIR/$SQUASH_IMG -no-exports -noappend -no-recovery -no-fragments -all-root -comp $COMPRESSOR
-fi
-
-rm -r $SQUASHFS_ROOT
+[[ "x$COMPRESSOR" == "x" ]] && COMPRESSOR='xz'
+mksquashfs $SYSTEM_ROOT $ISO_DIR/$SQUASH_IMG -no-exports -noappend -no-recovery -no-fragments -comp $COMPRESSOR 2>/dev/null
 
 echo "Создаём новый образ $ISO_DST"
 
