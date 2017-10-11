@@ -4,8 +4,8 @@
 #
 
 # Название результирующего образа получается заменой фрагмента имени оригинала
-NAME_ORIG='.iso'
-NAME_DEST='-v2.iso'
+NAME_ORIG='uefi'
+NAME_DEST='uefi3264'
 
 # Имя файла SquashFS в составе образа
 SQUASH_IMG='LiveOS/squashfs.img'
@@ -42,6 +42,22 @@ mkdir $ISO_DIR
 7z x $ISO_SRC -o$ISO_DIR -bso0 || die 'ошибка распаковки ISO'
 rm -rf $ISO_DIR'/[BOOT]'
 
+echo 'Добавляем 32х разрядный EFI загрузчик'
+rm -rf rpms
+mkdir rpms
+get_rpm()
+{
+    REPO_URL=http://abf-downloads.rosalinux.ru/rosa2016.1/repository/i586/main/release
+    [[ -e $@ ]] || wget $REPO_URL/$@ || die "недоступен $@"
+    rpm2cpio $@ | cpio -dium --directory=rpms || die "ошибка распаковки $@"
+}
+GRUB_PKG=grub2-efi-2.00-79-rosa2014.1.i586.rpm
+SHIM_PKG=shim-0.9-3-rosa2016.1.i586.rpm
+get_rpm $SHIM_PKG
+get_rpm $GRUB_PKG
+cp rpms/boot/efi/EFI/rosa/grub2-efi/grubcd.efi $ISO_DIR/EFI/BOOT/grubia32.efi
+cp rpms/boot/efi/EFI/rosa/BOOTIA32.efi $ISO_DIR/EFI/BOOT/
+
 unsquashfs -d $SQUASHFS_ROOT $ISO_DIR/$SQUASH_IMG || die 'ошибка рапаковки SquashFS'
 
 echo "Монтируем $SYSTEM_IMG"
@@ -54,6 +70,44 @@ echo -en '\x1b[1m'
 sudo tee $SYSTEM_ROOT/runme << EOF
 # Следующие команды выполнятся в контексте распакованного образа
 cat /etc/os-release
+
+# Отключаем чрезмерные циклы записи при установке пакетов
+echo 'export PKGSYSTEM_ENABLE_FSYNC=0' > /etc/profile.d/update-mime-database.sh
+echo '%__nofsync nofsync' >> /etc/rpm/macros
+
+# Образ ориентрован не на виртюмашины.
+urpme dkms-vboxadditions --auto
+
+# Репозиторий с адаптированным ядром и alsa-lib
+urpmi.addmedia st_personal http://abf-downloads.rosalinux.ru/st_personal/repository/rosa2016.1/x86_64/main/release/
+
+# Репозиторий с обновлённым графическим стеком
+urpmi.addmedia x11 http://abf-downloads.rosalinux.ru/x11_backports_personal/repository/rosa2016.1/x86_64/main/release/
+urpmi.addmedia x11-32 http://abf-downloads.rosalinux.ru/x11_backports_personal/repository/rosa2016.1/i586/main/release/
+
+# Версия драйвера Broadcom-WL для 4.13 на QA
+urpmi.addmedia wl http://abf-downloads.rosalinux.ru/rosa2016.1/container/2899354/x86_64/non-free/release/
+
+urpme dkms-broadcom-wl
+
+# Актуализируем версии пакетов
+urpmi --auto-update --auto
+
+# Дополнительные пакеты
+urpmi qt5-qtvirtualkeyboard --auto
+
+# Заменяем обычное ядро адаптированным
+echo 'hostonly="no"' > /etc/dracut.conf.d/tmp.conf
+urpmi kernel-tablet-4.13-latest kernel-tablet-4.13-devel-latest --auto
+urpme kernel-nrj-desktop-4.9-devel-latest kernel-nrj-desktop-4.9-latest --force
+urpme kernel-nrj-desktop-devel kernel-nrj-desktop -a --auto
+urpmi dkms-broadcom-wl
+rm -f /boot/initrd-4.{9,11,12}*
+rm -f /boot/*old.img
+rm /etc/dracut.conf.d/tmp.conf
+chmod +r /boot/initrd*
+
+urpmi.removemedia wl
 
 rpm -qa | sort > /rpm.list
 EOF
@@ -71,12 +125,17 @@ echo -en "$BUILD_NO\n# Modified on " > $ISO_DIR/rpm.lst
 date -R >> $ISO_DIR/rpm.lst
 cat $SYSTEM_ROOT/rpm.list >> $ISO_DIR/rpm.lst
 
+# Копируем ядро в стартовый каталог ISO
+cp $SYSTEM_ROOT/boot/vmlinuz* $ISO_DIR/isolinux/vmlinuz0
+cp $SYSTEM_ROOT/boot/initrd* $ISO_DIR/isolinux/initrd0.img
+
 echo 'Убираем за собой'
-sudo rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list
+sudo rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list $SYSTEM_ROOT/Module.symvers
 
 # Для лучшего сжатия зануляем свободные блоки файловой системы
 sudo cp /dev/zero $SYSTEM_ROOT/free_space 2> /dev/null
 sudo rm $SYSTEM_ROOT/free_space
+
 
 sudo umount $SYSTEM_ROOT
 rmdir $SYSTEM_ROOT
