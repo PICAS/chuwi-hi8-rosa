@@ -75,7 +75,7 @@ cat /etc/os-release
 echo 'export PKGSYSTEM_ENABLE_FSYNC=0' > /etc/profile.d/update-mime-database.sh
 echo '%__nofsync nofsync' >> /etc/rpm/macros
 
-# Образ ориентрован не на виртюмашины.
+# Образ ориентрован не на вирт.машины.
 urpme dkms-vboxadditions --auto
 
 # Репозиторий с адаптированным ядром и alsa-lib
