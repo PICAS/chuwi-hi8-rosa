@@ -116,8 +116,18 @@ echo -en '\x1b[0m'
 
 sudo chmod +x $SYSTEM_ROOT/runme
 echo -en '\x1b[1;33m'
-sudo systemd-nspawn --directory=$SYSTEM_ROOT /runme
+sudo mount --bind /dev/    $SYSTEM_ROOT/dev
+sudo mount --bind /dev/pts $SYSTEM_ROOT/dev/pts
+sudo mount --bind /proc    $SYSTEM_ROOT/proc
+sudo mount --bind /sys     $SYSTEM_ROOT/sys
+sudo cp /etc/resolv.conf $SYSTEM_ROOT/etc/
+sudo chroot $SYSTEM_ROOT /runme
 echo -en '\x1b[0m'
+
+sudo umount $SYSTEM_ROOT/sys
+sudo umount $SYSTEM_ROOT/proc
+sudo umount $SYSTEM_ROOT/dev/pts
+sudo umount $SYSTEM_ROOT/dev
 
 # Формируем актуальный перечень установленных пакетов, добавив дату изменения
 BUILD_NO=`head --lines 1 $ISO_DIR/rpm.lst`
@@ -135,7 +145,6 @@ sudo rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list $SYSTEM_ROOT/Module.symvers
 # Для лучшего сжатия зануляем свободные блоки файловой системы
 sudo cp /dev/zero $SYSTEM_ROOT/free_space 2> /dev/null
 sudo rm $SYSTEM_ROOT/free_space
-
 
 sudo umount $SYSTEM_ROOT
 rmdir $SYSTEM_ROOT
