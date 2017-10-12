@@ -1,0 +1,59 @@
+Some 64 bit Intel processors run 32 bit EFI.
+Choose correct bitness via efi/fw_platform_size
+while installing GRUB bootloader.
+
+Signed-off-by: Sergei A. Trusov <sergei.a.trusov@ya.ru>
+---
+
+--- org/usr/sbin/grub2-efi-install	2016-07-09 00:41:09.000000000 +1000
++++ new/usr/sbin/grub2-efi-install	2017-10-12 19:31:36.226000180 +1000
+@@ -293,7 +293,10 @@
+ 			modprobe -q efivars 2>/dev/null || true ;;
+ 		esac
+ 		if [ -d /sys/firmware/efi ]; then
+-		    target="x86_64-efi"
++		    case `cat /sys/firmware/efi/fw_platform_size` in
++			32) target="i386-efi";;
++			*)  target="x86_64-efi";;
++		    esac
+ 		else
+ 		    target=i386-pc
+ 		fi
+@@ -309,7 +312,10 @@
+ 			modprobe -q efivars 2>/dev/null || true ;;
+ 		esac
+ 		if [ -d /sys/firmware/efi ]; then
+-		    target="i386-efi"
++		    case `cat /sys/firmware/efi/fw_platform_size` in
++			32) target="i386-efi";;
++			*)  target="x86_64-efi";;
++		    esac
+ 		elif [ -e /proc/device-tree ]; then
+ 		    target=i386-pc
+ 		    for x in /proc/device-tree/*; do
+--- org/usr/sbin/grub2-install	2016-07-09 00:42:02.000000000 +1000
++++ new/usr/sbin/grub2-install	2017-10-12 19:28:45.245367409 +1000
+@@ -293,7 +293,10 @@
+ 			modprobe -q efivars 2>/dev/null || true ;;
+ 		esac
+ 		if [ -d /sys/firmware/efi ]; then
+-		    target="x86_64-efi"
++		    case `cat /sys/firmware/efi/fw_platform_size` in
++			32) target="i386-efi";;
++			*)  target="x86_64-efi";;
++		    esac
+ 		else
+ 		    target=i386-pc
+ 		fi
+@@ -309,7 +312,10 @@
+ 			modprobe -q efivars 2>/dev/null || true ;;
+ 		esac
+ 		if [ -d /sys/firmware/efi ]; then
+-		    target="i386-efi"
++		    case `cat /sys/firmware/efi/fw_platform_size` in
++			32) target="i386-efi";;
++			*)  target="x86_64-efi";;
++		    esac
+ 		elif [ -e /proc/device-tree ]; then
+ 		    target=i386-pc
+ 		    for x in /proc/device-tree/*; do
