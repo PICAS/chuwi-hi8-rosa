@@ -91,7 +91,7 @@ urpmi.addmedia wl http://abf-downloads.rosalinux.ru/rosa2016.1/container/2899354
 urpme dkms-broadcom-wl
 
 # Актуализируем версии пакетов
-urpmi --auto-update --auto
+/usr/sbin/urpmi --auto-update --auto
 
 # Дополнительные пакеты
 urpmi qt5-qtvirtualkeyboard --auto
@@ -121,7 +121,7 @@ sudo mount --bind /dev/pts $SYSTEM_ROOT/dev/pts
 sudo mount --bind /proc    $SYSTEM_ROOT/proc
 sudo mount --bind /sys     $SYSTEM_ROOT/sys
 sudo cp /etc/resolv.conf $SYSTEM_ROOT/etc/
-sudo chroot $SYSTEM_ROOT /runme
+sudo env PKGSYSTEM_ENABLE_FSYNC=0 chroot $SYSTEM_ROOT /bin/bash --login /runme
 echo -en '\x1b[0m'
 
 sudo umount $SYSTEM_ROOT/sys
