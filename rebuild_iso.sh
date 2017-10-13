@@ -99,15 +99,20 @@ urpme dkms-broadcom-wl
 # Дополнительные пакеты
 urpmi qt5-qtvirtualkeyboard --auto
 
+# Временная конфигурация dracut
+echo 'hostonly="no"' > /etc/dracut.conf.d/tmplive.conf
+echo 'add_dracutmodules+=" dmsquash-live pollcdrom "' >> /etc/dracut.conf.d/tmplive.conf
+echo 'omit_dracutmodules+=" aufs-mount "' >> /etc/dracut.conf.d/tmplive.conf
+
 # Заменяем обычное ядро адаптированным
-echo 'hostonly="no"' > /etc/dracut.conf.d/tmp.conf
 urpmi kernel-tablet-4.13-latest kernel-tablet-4.13-devel-latest --auto
+
 urpme kernel-nrj-desktop-4.9-devel-latest kernel-nrj-desktop-4.9-latest --force
 urpme kernel-nrj-desktop-devel kernel-nrj-desktop -a --auto
 urpmi dkms-broadcom-wl
 rm -f /boot/initrd-4.{9,11,12}*
 rm -f /boot/*old.img
-rm /etc/dracut.conf.d/tmp.conf
+rm /etc/dracut.conf.d/tmplive.conf
 chmod +r /boot/initrd*
 
 urpmi.removemedia wl
