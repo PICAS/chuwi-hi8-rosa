@@ -65,6 +65,9 @@ mkdir $SYSTEM_ROOT
 sudo mount -o noatime $SQUASHFS_ROOT/$SYSTEM_IMG $SYSTEM_ROOT || die 'ошибка монтирования'
 
 echo 'Обновляем'
+
+[ -e cache ] && echo 'Копируем кэш пакетов' && sudo rsync -a cache/ $SYSTEM_ROOT/var/cache/urpmi/
+
 echo -en '\x1b[1m'
 ##############################################################################
 sudo tee $SYSTEM_ROOT/runme << EOF
@@ -147,6 +150,7 @@ cp $SYSTEM_ROOT/boot/initrd* $ISO_DIR/isolinux/initrd0.img
 
 echo 'Убираем за собой'
 sudo rm $SYSTEM_ROOT/runme $SYSTEM_ROOT/rpm.list $SYSTEM_ROOT/Module.symvers
+sudo rm -f $SYSTEM_ROOT/var/cache/urpmi/rpms/*
 
 # Для лучшего сжатия зануляем свободные блоки файловой системы
 sudo cp /dev/zero $SYSTEM_ROOT/free_space 2> /dev/null
