@@ -5,7 +5,7 @@
 
 # Название результирующего образа получается заменой фрагмента имени оригинала
 NAME_ORIG='uefi'
-NAME_DEST='uefi3264'
+NAME_DEST='uefi3264-Silvermont'
 
 # Имя файла SquashFS в составе образа
 SQUASH_IMG='LiveOS/squashfs.img'
