@@ -126,6 +126,15 @@ chmod +r /boot/initrd*
 
 urpmi.removemedia wl
 
+# Адаптируем конфигурацию PulseAudio
+tee /etc/pulse/daemon.conf << _EOF
+# Byt/Cht
+realtime-scheduling = no
+#sample rate supported by hardware: check "pactl list sinks" output)
+default-sample-rate = 48000
+resample-method = speex-float-1
+_EOF
+
 rpm -qa | sort > /rpm.list
 EOF
 ##############################################################################
