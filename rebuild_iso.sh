@@ -135,6 +135,13 @@ default-sample-rate = 48000
 resample-method = speex-float-1
 _EOF
 
+# Адаптируем конфигурацию NetworkManager для Rtl8723BS
+tee /etc/NetworkManager/NetworkManager.conf << _EOF
+[device]
+#match-device=interface-name:wlan0
+wifi.scan-rand-mac-address=no
+_EOF
+
 rpm -qa | sort > /rpm.list
 EOF
 ##############################################################################
