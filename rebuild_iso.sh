@@ -174,6 +174,9 @@ rpm2cpio $SHIM_PKG | sudo cpio -dium --directory=$SYSTEM_ROOT || die "ошибк
 # так же исправляет и установленный grub2
 sudo patch -p1 -d $SYSTEM_ROOT -i ../grub-install-choose-correct-efi-loader.patch
 
+echo "Копируем дополнительные файлы"
+sudo rsync -rlpt extra/ $SYSTEM_ROOT/
+
 # Формируем актуальный перечень установленных пакетов, добавив дату изменения
 BUILD_NO=`head --lines 1 $ISO_DIR/rpm.lst`
 echo -en "$BUILD_NO\n# Modified on " > $ISO_DIR/rpm.lst
