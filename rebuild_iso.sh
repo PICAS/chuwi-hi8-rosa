@@ -142,6 +142,9 @@ tee /etc/NetworkManager/NetworkManager.conf << _EOF
 wifi.scan-rand-mac-address=no
 _EOF
 
+# Включаем qtvirtualkeyboard
+echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
+
 rpm -qa | sort > /rpm.list
 EOF
 ##############################################################################
