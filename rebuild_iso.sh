@@ -57,6 +57,15 @@ get_rpm $SHIM_PKG
 get_rpm $GRUB_PKG
 cp rpms/boot/efi/EFI/rosa/grub2-efi/grubcd.efi $ISO_DIR/EFI/BOOT/grubia32.efi
 cp rpms/boot/efi/EFI/rosa/BOOTIA32.efi $ISO_DIR/EFI/BOOT/
+echo 'Создаём образ заргузочного EFI раздела'
+mkdir efiboot
+rm $ISO_DIR/isolinux/efiboot.img &&
+dd of=$ISO_DIR/isolinux/efiboot.img if=/dev/zero bs=512K count=`du -sB 512K $ISO_DIR/EFI | sed s/[^0-9]//g` &&
+mkfs.fat -n 'EFI' $ISO_DIR/isolinux/efiboot.img &&
+sudo mount $ISO_DIR/isolinux/efiboot.img efiboot &&
+sudo cp -R $ISO_DIR/EFI/ efiboot/EFI/ || die 'ошибка создания загрузочного раздела'
+sudo umount efiboot
+rmdir efiboot
 
 unsquashfs -d $SQUASHFS_ROOT $ISO_DIR/$SQUASH_IMG || die 'ошибка рапаковки SquashFS'
 
