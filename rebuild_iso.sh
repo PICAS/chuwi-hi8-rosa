@@ -145,6 +145,9 @@ _EOF
 # Включаем qtvirtualkeyboard
 echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
 
+# Поддержка сенсорного экрана в Firefox
+echo 'export MOZ_USE_XINPUT2=1' > /etc/profile.d/firefox.sh
+
 rpm -qa | sort > /rpm.list
 EOF
 ##############################################################################
