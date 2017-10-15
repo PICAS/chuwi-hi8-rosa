@@ -148,6 +148,9 @@ echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
 # Поддержка сенсорного экрана в Firefox
 echo 'export MOZ_USE_XINPUT2=1' > /etc/profile.d/firefox.sh
 
+# Значки от Рамиля
+urpmi http://abf-downloads.rosalinux.ru/survolog_personal/repository/rosa2016.1/x86_64/main/release/rospo-icon-theme-1.0-1-rosa2016.1.noarch.rpm
+
 # Должно исключить "Rebuild dynamic linker cache" при запуске
 rm /etc/ld.so.cache
 ldconfig
