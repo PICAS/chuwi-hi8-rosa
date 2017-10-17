@@ -128,13 +128,11 @@ chmod +r /boot/initrd*
 urpmi.removemedia wl
 
 # Адаптируем конфигурацию PulseAudio
-tee /etc/pulse/daemon.conf << _EOF
-# Byt/Cht
-realtime-scheduling = no
-#sample rate supported by hardware: check "pactl list sinks" output)
-default-sample-rate = 48000
-resample-method = speex-float-1
-_EOF
+echo '# Byt/Cht' >> /etc/pulse/daemon.conf
+echo 'realtime-scheduling = no' >> /etc/pulse/daemon.conf
+echo '#sample rate supported by hardware: check "pactl list sinks" output)' >> /etc/pulse/daemon.conf
+echo 'default-sample-rate = 48000' >> /etc/pulse/daemon.conf
+echo 'resample-method = speex-float-1' >> /etc/pulse/daemon.conf
 
 # Адаптируем конфигурацию NetworkManager для Rtl8723BS
 echo '[device]' >> /etc/NetworkManager/NetworkManager.conf
