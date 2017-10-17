@@ -176,8 +176,8 @@ sudo umount $SYSTEM_ROOT/dev/pts
 sudo umount $SYSTEM_ROOT/dev
 
 echo "Устанавливаем $GRUB_PKG и $SHIM_PKG"
-rpm2cpio $GRUB_PKG | sudo cpio -dium --directory=$SYSTEM_ROOT || die "ошибка распаковки $GRUB_PKG"
-rpm2cpio $SHIM_PKG | sudo cpio -dium --directory=$SYSTEM_ROOT || die "ошибка распаковки $SHIM_PKG"
+rm -rf rpms/{etc,usr/{bin,sbin,share}}
+sudo rsync -rlpt rpms/ $SYSTEM_ROOT/ || die "ошибка копирования $GRUB_PKG и $SHIM_PKG"
 # так же исправляет и установленный grub2
 sudo patch -p1 -d $SYSTEM_ROOT -i ../grub-install-choose-correct-efi-loader.patch
 
