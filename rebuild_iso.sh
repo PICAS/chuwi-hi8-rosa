@@ -107,6 +107,7 @@ urpme dkms-broadcom-wl
 
 # Дополнительные пакеты
 urpmi qt5-qtvirtualkeyboard --auto
+urpmi vaapi-driver-intel libva-utils --auto
 
 # Временная конфигурация dracut
 echo 'hostonly="no"' > /etc/dracut.conf.d/tmplive.conf
