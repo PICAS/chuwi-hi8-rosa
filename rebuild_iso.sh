@@ -105,6 +105,9 @@ urpme dkms-broadcom-wl
 # Актуализируем версии пакетов
 /usr/sbin/urpmi --auto-update --auto
 
+# При обновлении до 16й версии изменился формат
+mv /etc/sddm.conf.rpmnew /etc/sddm.conf
+
 # Дополнительные пакеты
 urpmi qt5-qtvirtualkeyboard --auto
 urpmi vaapi-driver-intel libva-utils --auto
