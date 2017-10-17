@@ -137,11 +137,9 @@ resample-method = speex-float-1
 _EOF
 
 # Адаптируем конфигурацию NetworkManager для Rtl8723BS
-tee /etc/NetworkManager/NetworkManager.conf << _EOF
-[device]
-#match-device=interface-name:wlan0
-wifi.scan-rand-mac-address=no
-_EOF
+echo '[device]' >> /etc/NetworkManager/NetworkManager.conf
+echo '#match-device=interface-name:wlan0' >> /etc/NetworkManager/NetworkManager.conf
+echo 'wifi.scan-rand-mac-address=no' >> /etc/NetworkManager/NetworkManager.conf
 
 # Включаем qtvirtualkeyboard
 echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
