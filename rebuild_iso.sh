@@ -177,6 +177,7 @@ sudo umount $SYSTEM_ROOT/dev
 
 echo "Устанавливаем $GRUB_PKG и $SHIM_PKG"
 rm -rf rpms/{etc,usr/{bin,sbin,share}}
+mv rpms/boot/efi/EFI/rosa/grub2-efi rpms/boot/efi/EFI/rosa/grub2-efi32
 sudo rsync -rlpt rpms/ $SYSTEM_ROOT/ || die "ошибка копирования $GRUB_PKG и $SHIM_PKG"
 # так же исправляет и установленный grub2
 sudo patch -p1 -d $SYSTEM_ROOT -i ../grub-install-choose-correct-efi-loader.patch

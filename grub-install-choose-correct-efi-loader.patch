@@ -32,6 +32,18 @@ v2: Added bitness check for the SecureBoot enabled case
  		elif [ -e /proc/device-tree ]; then
  		    target=i386-pc
  		    for x in /proc/device-tree/*; do
+@@ -822,7 +822,10 @@
+     echo 1>&2
+ elif [ x"$grub_modinfo_platform" = xefi ]; then
+     # Using pre-built and signed grub binary to support booting with SecureBoot enabled
+-    cp "${efidir}/grub2-efi/grub.efi" "${efidir}/${efi_file}"
++    case `cat /sys/firmware/efi/fw_platform_size` in
++	32) cp "${efidir}/grub2-efi32/grub.efi" "${efidir}/${efi_file}";;
++	*)  cp "${efidir}/grub2-efi/grub.efi" "${efidir}/${efi_file}";;
++    esac
+     # For old macs. Suggested by Peter Jones.
+     if [ x$grub_modinfo_target_cpu = xi386 ]; then
+ 	cp "${grubdir}/${grub_modinfo_target_cpu}-$grub_modinfo_platform/core.${imgext}" "${efidir}/boot.efi"
 @@ -863,9 +863,12 @@
  	if test -z "$efidir_drive" || test -z "$efidir_disk"; then
  	    gettext_printf "Can't find GRUB drive for %s; unable to create EFI Boot Manager entry.\n" "$efidir" >&2
