@@ -112,6 +112,9 @@ mv /etc/sddm.conf.rpmnew /etc/sddm.conf
 urpmi qt5-qtvirtualkeyboard --auto
 urpmi vaapi-driver-intel libva-utils --auto
 
+# Значки от РОСПО Дизайн
+urpmi rospo-icon-theme
+
 # Временная конфигурация dracut
 echo 'hostonly="no"' > /etc/dracut.conf.d/tmplive.conf
 echo 'add_dracutmodules+=" dmsquash-live pollcdrom "' >> /etc/dracut.conf.d/tmplive.conf
@@ -147,9 +150,6 @@ echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
 
 # Поддержка сенсорного экрана в Firefox
 echo 'export MOZ_USE_XINPUT2=1' > /etc/profile.d/firefox.sh
-
-# Значки от Рамиля
-urpmi http://abf-downloads.rosalinux.ru/survolog_personal/repository/rosa2016.1/x86_64/main/release/rospo-icon-theme-1.0-1-rosa2016.1.noarch.rpm
 
 # Должно исключить "Rebuild dynamic linker cache" при запуске
 rm /etc/ld.so.cache
