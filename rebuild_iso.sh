@@ -107,6 +107,7 @@ urpme dkms-broadcom-wl
 
 # Дополнительные пакеты
 urpmi onboard --auto
+urpmi http://abf-downloads.rosalinux.ru/trs_personal/repository/rosa2016.1/x86_64/main/release/iio-sensor-proxy-2.2-1-rosa2016.1.x86_64.rpm
 urpmi vaapi-driver-intel libva-utils --auto
 
 # Значки от РОСПО Дизайн
