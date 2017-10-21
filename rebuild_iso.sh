@@ -109,7 +109,7 @@ urpme dkms-broadcom-wl
 mv /etc/sddm.conf.rpmnew /etc/sddm.conf
 
 # Дополнительные пакеты
-urpmi qt5-qtvirtualkeyboard --auto
+urpmi onboard --auto
 urpmi vaapi-driver-intel libva-utils --auto
 
 # Значки от РОСПО Дизайн
