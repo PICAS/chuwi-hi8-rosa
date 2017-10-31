@@ -140,11 +140,6 @@ echo '#sample rate supported by hardware: check "pactl list sinks" output)' >> /
 echo 'default-sample-rate = 48000' >> /etc/pulse/daemon.conf
 echo 'resample-method = speex-float-1' >> /etc/pulse/daemon.conf
 
-# Адаптируем конфигурацию NetworkManager для Rtl8723BS
-echo '[device]' >> /etc/NetworkManager/NetworkManager.conf
-echo '#match-device=interface-name:wlan0' >> /etc/NetworkManager/NetworkManager.conf
-echo 'wifi.scan-rand-mac-address=no' >> /etc/NetworkManager/NetworkManager.conf
-
 # Включаем qtvirtualkeyboard
 echo 'export QT_IM_MODULE=qtvirtualkeyboard' > /etc/profile.d/qtvk.sh
 
