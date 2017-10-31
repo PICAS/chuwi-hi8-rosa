@@ -113,7 +113,7 @@ urpmi qt5-qtvirtualkeyboard --auto
 urpmi vaapi-driver-intel libva-utils --auto
 
 # Значки от РОСПО Дизайн
-urpmi rospo-icon-theme
+urpmi rospo-icon-theme --auto
 
 # Временная конфигурация dracut
 echo 'hostonly="no"' > /etc/dracut.conf.d/tmplive.conf
