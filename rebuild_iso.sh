@@ -92,6 +92,7 @@ urpme dkms-vboxadditions --auto
 
 # Репозиторий с адаптированным ядром и alsa-lib
 urpmi.addmedia st_personal http://abf-downloads.rosalinux.ru/st_personal/repository/rosa2016.1/x86_64/main/release/
+urpmi.addmedia st_personal-32 http://abf-downloads.rosalinux.ru/st_personal/repository/rosa2016.1/i586/main/release/
 
 # Репозиторий с обновлённым графическим стеком
 urpmi.addmedia x11 http://abf-downloads.rosalinux.ru/x11_backports_personal/repository/rosa2016.1/x86_64/main/release/
